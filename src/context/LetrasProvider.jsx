@@ -6,8 +6,11 @@ const LetrasContext = createContext();
 
 const LetrasProvider = ({ children }) => {
   const [alerta, setAlerta] = useState("");
+  const [letra, setLetra] = useState("");
+  const [cargando, setCargando] = useState(false);
 
   const busquedaLetra = async (busqueda) => {
+    setCargando(true);
     const { artista, cancion } = busqueda;
     const newArtista = parseText(artista);
     const newCancion = parseText(cancion);
@@ -23,15 +26,20 @@ const LetrasProvider = ({ children }) => {
     await axios
       .request(options)
       .then(function (response) {
-        console.log(response.data[0].songName);
+        setLetra(response.data[0].songLyric);
+        setAlerta("");
       })
       .catch(function (error) {
         console.error(error);
+        setAlerta("Canción no encontrada");
       });
+    setCargando(false);
   };
 
   return (
-    <LetrasContext.Provider value={{ alerta, setAlerta, busquedaLetra }}>
+    <LetrasContext.Provider
+      value={{ alerta, setAlerta, busquedaLetra, letra, cargando }}
+    >
       {children}
     </LetrasContext.Provider>
   );
